@@ -22,7 +22,7 @@ var canvas1 = document.createElement('canvas');
 var ctx1 = canvas1.getContext('2d');
 ctx1.font = "Bold 10px Arial";
 ctx1.fillStyle = "rgba(255,255,255,1)";
-ctx1.fillText('Balls!', 0, 60);
+ctx1.fillText('Balls!', 137, 78);
 
 var tex = new THREE.Texture(canvas1);
 tex.needsUpdate = true;
@@ -34,30 +34,35 @@ var material1 = new THREE.MeshBasicMaterial({
 material1.transparent = true;
 
 var mesh1 = new THREE.Mesh(
-    new THREE.PlaneGeometry(50, 10),
+    new THREE.PlaneGeometry(100, 100),
     material1
 );
-mesh1.position.set(25, 0, -5);
+mesh1.position.set(0, 0, -5);
 scene.add(mesh1);
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(width, height);
 document.body.append(renderer.domElement);
 
+renderer.render(scene, camera);
+
 window.addEventListener('resize', (_) => {
     const width = window.innerWidth, height = window.innerHeight;
     renderer.setSize(width,height);
     camera.aspect = width/height;
     camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
 });
 
 window.addEventListener('mousemove', (e) => {
     const x = e.pageX-(window.innerWidth/2), y = e.pageY-(window.innerHeight/2);
     const mousePos = new THREE.Vector3(camera.position.x + (x/width), camera.position.y + -(y/height), camera.position.z);
     const matrix = new THREE.Matrix4();
-    matrix.lookAt(mesh.position, mousePos, new THREE.Vector3(0,1,0));
-    mesh.matrix.multiply(matrix);
-    mesh.rotation.setFromRotationMatrix(matrix);
-    raymesh.rotation.setFromRotationMatrix(matrix);
+    matrix.lookAt(mesh.position, mousePos.multiplyScalar(-1), new THREE.Vector3(0,1,0));
+    const m2 = matrix.clone();
+    mesh.matrix.multiply(m2);
+    mesh.rotation.setFromRotationMatrix(m2);
+    raymesh.rotation.setFromRotationMatrix(m2);
+    mesh1.rotation.setFromRotationMatrix(m2);
     renderer.render(scene, camera);
 });
